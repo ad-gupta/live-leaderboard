@@ -1,205 +1,106 @@
-"use client"
-import axios from 'axios'
-import { Button } from "@/components/ui/button";
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import Box from "@/components/custom/Box";
-import io from "socket.io-client"
+"use client";
+import { axiosInstance } from "@/lib/axiosInstance";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 interface TeamData {
   id: number;
   teamName: string;
   points: number;
 }
-
 const teamData: TeamData[] = [
   {
     id: 1,
     teamName: "Royal Challengers",
-    points:0,
+    points: 0,
   },
   {
     id: 2,
     teamName: "Mumbai Indians",
-    points:0,
+    points: 0,
   },
   {
     id: 3,
     teamName: "Chennai Super Kings",
-    points:0,
+    points: 0,
   },
   {
     id: 4,
     teamName: "Delhi Capitals",
-    points:0,
+    points: 0,
   },
   {
     id: 5,
     teamName: "Rajasthan Royals",
-    points:0,
+    points: 0,
   },
   {
     id: 6,
     teamName: "Kolkata Knights",
-    points:0,
+    points: 0,
   },
   {
     id: 7,
     teamName: "Punjab Kings",
-    points:0,
+    points: 0,
   },
   {
     id: 8,
     teamName: "Sunrisers",
-    points:0,
+    points: 0,
   },
   {
     id: 9,
     teamName: "Gujarat Titans",
-    points:0,
+    points: 0,
   },
   {
     id: 10,
     teamName: "Lucknow Giants",
-    points:0,
-  },
-];
-
-const options: TeamData[] = [
-  {
-    id: 1,
-    teamName: "Royal Challengers",
-    points: 16,
-  },
-  {
-    id: 2,
-    teamName: "Mumbai Indians",
-    points: 14,
-  },
-  {
-    id: 3,
-    teamName: "Chennai Super Kings",
-    points: 12,
-  },
-  {
-    id: 4,
-    teamName: "Delhi Capitals",
-    points: 10,
-  },
-  {
-    id: 5,
-    teamName: "Rajasthan Royals",
-    points: 10,
-  },
-  {
-    id: 6,
-    teamName: "Kolkata Knights",
-    points: 8,
-  },
-  {
-    id: 7,
-    teamName: "Punjab Kings",
-    points: 8,
-  },
-  {
-    id: 8,
-    teamName: "Sunrisers",
-    points: 6,
-  },
-  {
-    id: 9,
-    teamName: "Gujarat Titans",
-    points: 6,
-  },
-  {
-    id: 10,
-    teamName: "Lucknow Giants",
-    points: 4,
+    points: 0,
   },
 ];
 
 const page = () => {
-  const socket  = useMemo(() => io('http://localhost:4000'),[]);
   const [leaderboard, setLeaderboard] = useState<TeamData[]>(teamData);
+  const [name, setName] = useState<string>("")
+  const router = useRouter()
 
-
-
-  useEffect(() => {
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    })
-
-    socket.on('update-leaderboard', (msg) =>{
-      console.log(msg)
-      setLeaderboard(msg);
-    })
-
-    return () => {
-      socket.disconnect();
-      socket.off('update-leaderboard');
-    }
-  }, [])
-
-  const updateLeaderBoard = async(teamId:number, teamName:string) => {
-    socket.emit('update', {teamId, teamName});
-    console.log(teamId, teamName, 'updated-leaderboard')
-  }
-
-  const loadDB = async() => {
+  const loadDB = async () => {
     try {
-      const response = await axios.post('http://localhost:4000/api', {leaderboard});
-      console.log(response)
+      const axios = await axiosInstance();
+      await axios.post(`/api`, { name, leaderboard });
+      router.push('/start-game');
     } catch (error) {
-      console.error('Error fetching leaderboard:', error);
+      console.error("Error fetching leaderboard:", error);
     }
-  }
-
+  };
   return (
-    <div className="bg-slate-200">
-      <nav className="text-center font-bold w-full h-16 text-3xl pt-3 bg-slate-400 text-indigo-950 flex items-center justify-evenly">
-          <p>Vote Your Team Live</p>
-          <Button onClick={loadDB}>Start-Game</Button>
-        </nav>
-      <div className="flex flex-col items-center justify-center p-10 md:max-w-[70%] m-auto">
-        <Table className="text-gray-100 bg-indigo-950 rounded-xl">
-          <TableCaption>Live Cricket Match Leaderboard</TableCaption>
-          <TableHeader>
-            <TableRow className="text-center">
-              <TableHead className="text-green-400 font-semibold">
-                TEAM ID
-              </TableHead>
-              <TableHead className="text-green-400 font-semibold">
-                TEAM
-              </TableHead>
-              <TableHead className="text-green-400 font-semibold">
-                POINTS
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {leaderboard.map((team, ind) => (
-              <TableRow className="" key={team.id}>
-                <TableCell>{ind+1} </TableCell>
-                <TableCell>{team.teamName}</TableCell>
-                <TableCell>{team.points}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <div className="grid grid-cols-3 md:grid-cols-5 items-center justify-center flex-wrap">
-          {options.map((option) => (
-            <div className=" m-3 p-1 rounded-xl min-w-32" key={option.id} onClick={() => updateLeaderBoard(option.id, option.teamName)}>
-              <Box key={option.id} teamName={option.teamName} />
-            </div>
-          ))}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white p-6 rounded-xl shadow-md w-[500px]">
+        <h2 className="text-xl font-semibold text-center mb-4">
+          Vote Your Team, Get live leaderboard. Are You Ready?
+        </h2>
+        <div className="relative bg-gray-100 rounded-xl flex items-center p-3">
+          <input
+            type="text"
+            placeholder="Provide your username"
+            className="bg-transparent outline-none w-full text-gray-600"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <div className="flex space-x-3 text-gray-500">
+            <span className="cursor-pointer">⌛</span>
+            <span className="cursor-pointer">10</span>
+            <span className="cursor-pointer">min</span>
+          </div>
+          <button
+            className="ml-auto text-black bg-gray-200 p-2 rounded-full"
+            onClick={loadDB}
+          >
+            ⏺️
+          </button>
         </div>
       </div>
     </div>

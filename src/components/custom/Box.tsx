@@ -2,8 +2,8 @@ import React from 'react'
 
 const Box = ({ teamName }: {teamName: string}) => {
     return (
-        <div className="p-3 cursor-pointer h-16 bg-green-500 text-white rounded-lg shadow-md">
-            {teamName}
+        <div className="p-3 cursor-pointer h-16 m-auto bg-slate-950 text-slate-400 rounded-lg shadow-xl">
+            <p className='text-center mt-1 font-semibold'>{teamName}</p>
         </div>
     )
 }
