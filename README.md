@@ -23,6 +23,9 @@ A real-time interactive voting platform where users can support their favorite I
 4. Real-time updates are pushed to all connected clients using WebSockets.
 5. The platform ensures a seamless and engaging user experience with minimal latency.
 
+![Screenshot (7)](https://github.com/user-attachments/assets/c2163c41-7a51-403d-a8da-894f4dab04f4)
+
+
 ## Installation
 1. Clone the repository:
     ```bash
